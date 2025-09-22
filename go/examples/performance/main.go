@@ -2,13 +2,44 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"time"
 
 	"veclite"
 )
+
+// secureFloat32 generates a secure random float32 between -1 and 1
+func secureFloat32() float32 {
+	// Generate a random big.Int between 0 and 2^32-1
+	max := big.NewInt(1 << 32)
+	n, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		log.Fatal("Failed to generate secure random number:", err)
+	}
+	// Convert to float32 between 0 and 1, then scale to -1 to 1
+	return float32(n.Uint64())/float32(1<<32)*2 - 1
+}
+
+// secureIntn generates a secure random int between 0 and n-1
+func secureIntn(n int) int {
+	max := big.NewInt(int64(n))
+	result, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		log.Fatal("Failed to generate secure random number:", err)
+	}
+	return int(result.Int64())
+}
+
+// secureShuffle securely shuffles a slice using crypto/rand
+func secureShuffle(slice []string) {
+	for i := len(slice) - 1; i > 0; i-- {
+		j := secureIntn(i + 1)
+		slice[i], slice[j] = slice[j], slice[i]
+	}
+}
 
 func main() {
 	fmt.Println("VecLite Performance Demonstration")
@@ -40,7 +71,7 @@ func main() {
 		// Generate random vector
 		vector := make(veclite.Vector, dimensions)
 		for j := 0; j < dimensions; j++ {
-			vector[j] = rand.Float32()*2 - 1 // Random values between -1 and 1
+			vector[j] = secureFloat32() // Random values between -1 and 1
 		}
 
 		metadata := veclite.Metadata{
@@ -75,7 +106,7 @@ func main() {
 	// Generate random query vector
 	queryVector := make(veclite.Vector, dimensions)
 	for j := 0; j < dimensions; j++ {
-		queryVector[j] = rand.Float32()*2 - 1
+		queryVector[j] = secureFloat32()
 	}
 
 	searchCount := 100
@@ -173,9 +204,7 @@ func main() {
 	}
 
 	// Shuffle operations
-	rand.Shuffle(len(operations), func(i, j int) {
-		operations[i], operations[j] = operations[j], operations[i]
-	})
+	secureShuffle(operations)
 
 	searchCount = 0
 	insertCount := 0
@@ -194,7 +223,7 @@ func main() {
 		case "insert":
 			vector := make(veclite.Vector, dimensions)
 			for j := 0; j < dimensions; j++ {
-				vector[j] = rand.Float32()*2 - 1
+				vector[j] = secureFloat32()
 			}
 			metadata := veclite.Metadata{
 				"workload": "mixed",
@@ -211,7 +240,7 @@ func main() {
 
 		case "delete":
 			// Try to delete an existing vector
-			deleteIndex := rand.Intn(vectorCount)
+			deleteIndex := secureIntn(vectorCount)
 			id := fmt.Sprintf("vec_%d", deleteIndex)
 			err := db.Delete(id)
 			if err == nil {

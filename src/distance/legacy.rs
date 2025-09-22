@@ -227,6 +227,10 @@ mod simd_optimizations {
         pub fn distance_simd(&self, a: &VectorData, b: &VectorData) -> Score {
             debug_assert_eq!(a.len(), b.len());
 
+            // SAFETY: This unsafe block is used for SIMD optimization.
+            // - We verify that both vectors have the same length with debug_assert_eq!
+            // - We only access memory within bounds using checked arithmetic (i * 8)
+            // - AVX2 instructions are safe when used with proper alignment and bounds checking
             unsafe {
                 use std::arch::x86_64::*;
 

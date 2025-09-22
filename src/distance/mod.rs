@@ -104,6 +104,7 @@ fn manhattan_distance_simd(a: &VectorData, b: &VectorData) -> Score {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
         if is_x86_feature_detected!("avx2") {
+            // SAFETY: SIMD function is safe when vectors have been validated for equal length
             unsafe { manhattan_distance_avx2(a, b) }
         } else {
             manhattan_distance_scalar(a, b)

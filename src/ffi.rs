@@ -101,6 +101,8 @@ fn c_char_to_string(c_str: *const c_char) -> Result<String, FFIErrorCode> {
         return Err(FFIErrorCode::NullPointer);
     }
 
+    // SAFETY: We've checked that c_str is not null above.
+    // CStr::from_ptr is safe when the pointer is valid and null-terminated.
     unsafe {
         CStr::from_ptr(c_str)
             .to_str()
@@ -115,6 +117,8 @@ fn ffi_vector_to_vector_data(ffi_vec: FFIVector) -> Result<VectorData, FFIErrorC
         return Err(FFIErrorCode::NullPointer);
     }
 
+    // SAFETY: We've checked that ffi_vec.data is not null above.
+    // slice::from_raw_parts is safe when the pointer is valid and the length is correct.
     unsafe {
         let slice = slice::from_raw_parts(ffi_vec.data, ffi_vec.len as usize);
         Ok(slice.to_vec())
@@ -130,6 +134,8 @@ fn ffi_metadata_to_metadata(ffi_meta: FFIMetadata) -> Result<Metadata, FFIErrorC
     let mut metadata = HashMap::new();
 
     if ffi_meta.len > 0 {
+        // SAFETY: We've validated that entries is not null when len > 0.
+        // slice::from_raw_parts is safe when pointer is valid and length is correct.
         unsafe {
             let entries = slice::from_raw_parts(ffi_meta.entries, ffi_meta.len as usize);
             for entry in entries {
@@ -207,6 +213,7 @@ pub unsafe extern "C" fn veclite_new_with_config(
 #[no_mangle]
 pub unsafe extern "C" fn veclite_free(handle: VecLiteHandle) {
     if !handle.is_null() {
+        // SAFETY: handle came from Box::into_raw in veclite_new, so it's valid to convert back
         let _db = unsafe { Box::from_raw(handle as *mut Helix) };
         // Automatic cleanup when Box is dropped
     }
@@ -449,6 +456,7 @@ pub unsafe extern "C" fn veclite_load(path: *const c_char) -> VecLiteHandle {
 #[no_mangle]
 pub unsafe extern "C" fn veclite_free_string(s: *mut c_char) {
     if !s.is_null() {
+        // SAFETY: s was allocated by this library using CString::into_raw
         let _ = unsafe { CString::from_raw(s) };
     }
 }

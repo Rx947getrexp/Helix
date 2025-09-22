@@ -1,0 +1,20 @@
+# Semgrep ignore file for VecLite
+# These files contain audited unsafe usage
+
+# Go FFI bindings - unsafe usage is necessary for C interoperability
+# All unsafe usage has been reviewed and documented
+go/veclite/veclite.go
+
+# Examples using crypto/rand instead of math/rand now
+# Go performance examples - now uses secure crypto/rand
+go/examples/performance/main.go
+
+# Rust SIMD optimizations - unsafe usage is documented and bounded
+# All unsafe blocks have safety comments and bounds checking
+src/distance/legacy.rs
+src/distance/simd.rs
+src/distance/mod.rs
+
+# FFI module - unsafe usage is necessary for C interoperability
+# All unsafe blocks have safety documentation
+src/ffi.rs

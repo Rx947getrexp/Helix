@@ -194,8 +194,10 @@ pub fn euclidean_distance_simd(a: &VectorData, b: &VectorData) -> Score {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
         if is_x86_feature_detected!("avx2") {
+            // SAFETY: AVX2 function is safe when feature is detected and vectors are validated
             unsafe { euclidean_distance_avx2(a, b) }
         } else if is_x86_feature_detected!("sse2") {
+            // SAFETY: SSE2 function is safe when feature is detected and vectors are validated
             unsafe { euclidean_distance_sse2(a, b) }
         } else {
             euclidean_distance_scalar(a, b)
@@ -213,6 +215,7 @@ pub fn dot_product_simd(a: &VectorData, b: &VectorData) -> Score {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
         if is_x86_feature_detected!("avx2") {
+            // SAFETY: AVX2 function is safe when feature is detected and vectors are validated
             unsafe { dot_product_avx2(a, b) }
         } else {
             dot_product_scalar(a, b)
@@ -230,6 +233,7 @@ pub fn cosine_distance_simd(a: &VectorData, b: &VectorData) -> Score {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {
         if is_x86_feature_detected!("avx2") {
+            // SAFETY: AVX2 function is safe when feature is detected and vectors are validated
             unsafe { cosine_distance_avx2(a, b) }
         } else {
             cosine_distance_scalar(a, b)

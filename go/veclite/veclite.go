@@ -2,6 +2,13 @@
 //
 // VecLite is a lightweight, embeddable vector search library inspired by SQLite's
 // philosophy of being embedded, zero-configuration, and dependency-free.
+//
+// SECURITY NOTE: This package uses unsafe operations for C interoperability (CGO).
+// All unsafe usage is limited to:
+// 1. Converting Go strings to C strings and back
+// 2. Passing array pointers to C functions with known lengths
+// 3. Memory management for C-allocated data structures
+// These operations are necessary for FFI and are carefully bounds-checked.
 package veclite
 
 /*

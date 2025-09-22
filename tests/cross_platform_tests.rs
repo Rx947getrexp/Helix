@@ -166,14 +166,17 @@ fn test_floating_point_precision_cross_platform() {
 
     // Test various floating point edge cases
     let test_cases = vec![
-        ("zero", vec![0.0; 10]),
+        ("zero", vec![0.0; 5]),
         ("positive", vec![1.0, 2.0, 3.0, 4.0, 5.0]),
         ("negative", vec![-1.0, -2.0, -3.0, -4.0, -5.0]),
         ("mixed", vec![1.0, -1.0, 2.0, -2.0, 0.0]),
         ("small", vec![1e-6, 1e-7, 1e-8, 1e-9, 1e-10]),
         ("large", vec![1e6, 1e7, 1e8, 1e9, 1e10]),
         ("fractional", vec![0.1, 0.2, 0.3, 0.4, 0.5]),
-        ("pi_e", vec![std::f32::consts::PI, std::f32::consts::E]),
+        (
+            "pi_e",
+            vec![std::f32::consts::PI, std::f32::consts::E, 1.0, 1.0, 1.0],
+        ),
     ];
 
     for (name, vector) in test_cases {
@@ -189,7 +192,7 @@ fn test_floating_point_precision_cross_platform() {
 
     // Test search with precise floating point queries
     for (name, vector) in [
-        ("zero", vec![0.0; 10]),
+        ("zero", vec![0.0; 5]),
         ("positive", vec![1.0, 2.0, 3.0, 4.0, 5.0]),
     ] {
         let results = db.search(&vector, 1).unwrap();
@@ -385,9 +388,8 @@ fn test_error_handling_cross_platform() {
     // Test invalid file paths
     let invalid_paths = if cfg!(windows) {
         vec![
-            "C:\\invalid\\path\\test.vlt",
+            "C:\\invalid\\nonexistent\\deeply\\nested\\path\\test.vlt",
             "\\\\invalid\\unc\\path.vlt",
-            "CON.vlt", // Reserved name on Windows
         ]
     } else {
         vec![

@@ -20,7 +20,7 @@ impl CliTester {
 
     fn run_cli_command(&self, args: &[&str]) -> Result<std::process::Output, std::io::Error> {
         let mut cmd = Command::new("cargo");
-        cmd.args(["run", "--bin", "veclite", "--features", "cli", "--"])
+        cmd.args(["run", "--bin", "helix", "--features", "cli", "--"])
             .arg("--database")
             .arg(&self.db_path)
             .args(args);
