@@ -366,11 +366,15 @@ mod tests {
         let queries = vec![vec![1.0; 10]; 10];
         let distance_metric = Arc::new(EuclideanDistance);
 
-        let mut parallel_config = BatchConfig::default();
-        parallel_config.parallel_enabled = true;
+        let parallel_config = BatchConfig {
+            parallel_enabled: true,
+            ..Default::default()
+        };
 
-        let mut sequential_config = BatchConfig::default();
-        sequential_config.parallel_enabled = false;
+        let sequential_config = BatchConfig {
+            parallel_enabled: false,
+            ..Default::default()
+        };
 
         let parallel_results = optimized_batch_search(
             &queries,

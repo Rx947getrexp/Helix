@@ -359,7 +359,7 @@ mod tests {
     #[test]
     fn test_batch_operations() {
         let query = vec![1.0, 2.0, 3.0, 4.0];
-        let vectors = vec![
+        let vectors = [
             vec![2.0, 3.0, 4.0, 5.0],
             vec![3.0, 4.0, 5.0, 6.0],
             vec![1.0, 1.0, 1.0, 1.0],

@@ -23,8 +23,8 @@ COPY tests ./tests
 COPY benches ./benches
 COPY examples ./examples
 
-# Build the release binary
-RUN cargo build --release --bin helix
+# Build the release binary with CLI feature
+RUN cargo build --release --bin helix --features cli
 
 # Runtime stage
 FROM debian:bookworm-slim

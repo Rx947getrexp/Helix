@@ -115,7 +115,7 @@ jobs:
 
     - name: Test Go bindings
       run: |
-        cd go
+        cd go/veclite
         go mod tidy
         go test -v
 

@@ -689,8 +689,10 @@ mod tests {
             storage.insert(id, vector, metadata).unwrap();
         }
 
-        let mut config = PersistenceConfig::default();
-        config.compression_enabled = true;
+        let config = PersistenceConfig {
+            compression_enabled: true,
+            ..Default::default()
+        };
 
         let persistence = VLTPersistence::new(config);
 

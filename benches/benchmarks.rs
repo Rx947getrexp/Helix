@@ -39,10 +39,9 @@ fn bench_vector_insertion(c: &mut Criterion) {
                         || Helix::new().unwrap(),
                         |db| {
                             for (id, vector, metadata) in vectors.iter() {
-                                black_box(
-                                    db.insert(id.clone(), vector.clone(), metadata.clone())
-                                        .unwrap(),
-                                );
+                                db.insert(id.clone(), vector.clone(), metadata.clone())
+                                    .unwrap();
+                                black_box(());
                             }
                         },
                     );
@@ -56,7 +55,8 @@ fn bench_vector_insertion(c: &mut Criterion) {
                     b.iter_with_setup(
                         || Helix::new().unwrap(),
                         |db| {
-                            black_box(db.insert_batch(vectors.clone()).unwrap());
+                            db.insert_batch(vectors.clone()).unwrap();
+                            black_box(());
                         },
                     );
                 },
@@ -287,10 +287,9 @@ fn bench_hnsw_construction(c: &mut Criterion) {
 
                         let db = Helix::with_config(config).unwrap();
                         for (id, vector, metadata) in vectors.iter() {
-                            black_box(
-                                db.insert(id.clone(), vector.clone(), metadata.clone())
-                                    .unwrap(),
-                            );
+                            db.insert(id.clone(), vector.clone(), metadata.clone())
+                                .unwrap();
+                            black_box(());
                         }
                     });
                 },

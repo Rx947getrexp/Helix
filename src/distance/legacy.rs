@@ -342,7 +342,7 @@ mod tests {
 
         // Normal vectors
         let distance = metric.distance(&a, &b);
-        assert!(distance >= 0.0 && distance <= 2.0);
+        assert!((0.0..=2.0).contains(&distance));
 
         // Zero vector handling
         let distance_zero = metric.distance(&a, &zero);
@@ -381,7 +381,7 @@ mod tests {
     #[test]
     fn test_batch_distance_optimization() {
         let query = vec![1.0, 2.0, 3.0];
-        let vectors = vec![
+        let vectors = [
             vec![4.0, 5.0, 6.0],
             vec![7.0, 8.0, 9.0],
             vec![0.0, 1.0, 2.0],
@@ -477,7 +477,7 @@ mod tests {
     #[test]
     fn test_all_metrics_consistency() {
         let query = vec![1.0, 2.0, 3.0];
-        let vectors = vec![vec![1.0, 2.0, 3.0]]; // Identical to query
+        let vectors = [vec![1.0, 2.0, 3.0]]; // Identical to query
         let vector_refs: Vec<&VectorData> = vectors.iter().collect();
 
         // Test all metrics with identical vectors

@@ -223,7 +223,7 @@ mod tests {
         // Test SIMD Cosine
         let simd_cosine = SIMDCosineDistance;
         let cosine_result = simd_cosine.distance(&a, &b);
-        assert!(cosine_result >= 0.0 && cosine_result <= 2.0);
+        assert!((0.0..=2.0).contains(&cosine_result));
 
         // Test SIMD Dot Product
         let simd_dot = SIMDDotProductSimilarity;

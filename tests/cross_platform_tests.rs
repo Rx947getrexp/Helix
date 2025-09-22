@@ -243,7 +243,7 @@ fn test_unicode_support_cross_platform() {
         .search_with_filter(&vec![1.0, 2.0, 3.0], 10, |metadata| {
             metadata
                 .get("text")
-                .map_or(false, |text| text.contains("世界"))
+                .is_some_and(|text| text.contains("世界"))
         })
         .unwrap();
 
