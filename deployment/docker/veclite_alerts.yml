@@ -1,0 +1,81 @@
+# Prometheus alerting rules for VecLite
+
+groups:
+  - name: veclite_alerts
+    rules:
+      # High memory usage alert
+      - alert: VecLiteHighMemoryUsage
+        expr: veclite_memory_usage_bytes / veclite_memory_limit_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: veclite
+        annotations:
+          summary: "VecLite memory usage is high"
+          description: "VecLite memory usage is {{ $value | humanizePercentage }} which is above 85% threshold"
+
+      # Very high memory usage - critical alert
+      - alert: VecLiteCriticalMemoryUsage
+        expr: veclite_memory_usage_bytes / veclite_memory_limit_bytes > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          service: veclite
+        annotations:
+          summary: "VecLite memory usage is critically high"
+          description: "VecLite memory usage is {{ $value | humanizePercentage }} which is above 95% threshold"
+
+      # Slow query performance
+      - alert: VecLiteSlowQueries
+        expr: histogram_quantile(0.95, rate(veclite_search_duration_seconds_bucket[5m])) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+          service: veclite
+        annotations:
+          summary: "VecLite queries are slow"
+          description: "95th percentile query time is {{ $value }}s which is above 1s threshold"
+
+      # Service down
+      - alert: VecLiteDown
+        expr: up{job="veclite"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: veclite
+        annotations:
+          summary: "VecLite service is down"
+          description: "VecLite service has been down for more than 1 minute"
+
+      # High error rate
+      - alert: VecLiteHighErrorRate
+        expr: rate(veclite_errors_total[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          service: veclite
+        annotations:
+          summary: "VecLite error rate is high"
+          description: "VecLite error rate is {{ $value }} errors/second which is above 0.1/s threshold"
+
+      # Low pool efficiency
+      - alert: VecLiteLowPoolEfficiency
+        expr: veclite_pool_efficiency_ratio < 0.7
+        for: 10m
+        labels:
+          severity: warning
+          service: veclite
+        annotations:
+          summary: "VecLite memory pool efficiency is low"
+          description: "Pool efficiency is {{ $value | humanizePercentage }} which indicates memory fragmentation"
+
+      # Database size growing rapidly
+      - alert: VecLiteRapidGrowth
+        expr: increase(veclite_vector_count[1h]) > 10000
+        for: 0m
+        labels:
+          severity: info
+          service: veclite
+        annotations:
+          summary: "VecLite database is growing rapidly"
+          description: "Vector count increased by {{ $value }} in the last hour"

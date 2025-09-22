@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # VecLite main service
+  veclite:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: veclite-prod
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - veclite_data:/data
+      - veclite_logs:/logs
+      - ./veclite.toml:/config/veclite.toml:ro
+    environment:
+      - VECLITE_CONFIG_PATH=/config/veclite.toml
+      - VECLITE_LOG_LEVEL=info
+      - VECLITE_DATA_DIR=/data
+    healthcheck:
+      test: ["CMD", "veclite", "database", "info", "/data/database.vlt"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    networks:
+      - veclite-network
+
+  # Prometheus monitoring (optional)
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: veclite-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - veclite-network
+    depends_on:
+      - veclite
+
+  # Grafana dashboard (optional)
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: veclite-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - veclite-network
+    depends_on:
+      - prometheus
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: veclite-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - veclite-network
+    depends_on:
+      - veclite
+
+volumes:
+  veclite_data:
+    driver: local
+  veclite_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  veclite-network:
+    driver: bridge

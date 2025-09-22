@@ -1,0 +1,58 @@
+# Rust build artifacts
+/target/
+/Cargo.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Helix specific
+*.vlt
+*.hlx
+/tmp/
+/test_data/
+
+# Development and internal documentation
+docs/development/
+.claude/
+
+# Temporary files and databases
+benchmark_db.*
+database.*
+vectors.*
+*.tmp

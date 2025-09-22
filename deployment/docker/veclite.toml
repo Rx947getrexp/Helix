@@ -1,0 +1,61 @@
+# VecLite Docker Configuration
+# Optimized for containerized deployment
+
+[server]
+host = "0.0.0.0"
+port = 8080
+workers = 4
+max_connections = 1000
+
+[storage]
+data_dir = "/data"
+max_vectors = 1_000_000
+max_dimensions = 4096
+memory_limit_bytes = 2_147_483_648  # 2GB
+enable_checksums = true
+
+[memory]
+max_memory_bytes = 2_147_483_648    # 2GB
+enable_pooling = true
+pool_max_vectors = 500
+pool_max_pools = 5000
+enable_monitoring = true
+warning_threshold_percent = 80
+cleanup_threshold_percent = 90
+enable_auto_cleanup = true
+cleanup_interval_seconds = 300
+
+[index]
+index_type = "HNSW"
+
+[index.hnsw]
+m = 16
+max_m = 16
+max_m_l = 16
+ef_construction = 200
+ef_search = 50
+ml = 1.44269504088896
+
+[query]
+default_k = 10
+max_k = 1000
+ef_search = 50
+enable_metadata_filter = true
+
+[persistence]
+compression_enabled = true
+compression_level = 3
+checksum_enabled = true
+backup_count = 3
+
+[logging]
+level = "info"
+format = "json"
+file = "/logs/veclite.log"
+max_size = "50MB"
+max_files = 5
+
+[metrics]
+enabled = true
+endpoint = "/metrics"
+interval_seconds = 60

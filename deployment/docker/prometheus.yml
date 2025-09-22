@@ -1,0 +1,29 @@
+# Prometheus configuration for VecLite monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "veclite_alerts.yml"
+
+scrape_configs:
+  # VecLite metrics
+  - job_name: 'veclite'
+    static_configs:
+      - targets: ['veclite:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # Add alertmanager if needed
+          # - alertmanager:9093
