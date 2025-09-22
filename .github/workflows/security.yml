@@ -73,7 +73,7 @@ jobs:
         run: cargo audit --json > audit-results.json
 
       - name: Upload audit results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: audit-results
           path: audit-results.json
@@ -172,7 +172,7 @@ jobs:
           fi
 
       - name: Upload license report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: license-report
           path: licenses.json
@@ -213,7 +213,7 @@ jobs:
           timeout 300s cargo fuzz run distance_calculation || true
 
       - name: Upload fuzz artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: fuzz-artifacts
@@ -293,7 +293,7 @@ jobs:
           echo "4. Review license compatibility for new dependencies" >> security-report.md
 
       - name: Upload security report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-report
           path: security-report.md
