@@ -408,7 +408,7 @@ fn handle_vector_command(
                     if results.is_empty() {
                         println!("No results found.");
                     } else {
-                        println!("{:<20} {:<12} {}", "ID", "Score", "Metadata");
+                        println!("{:<20} {:<12} Metadata", "ID", "Score");
                         println!("{:-<50}", "");
                         for result in results {
                             let meta_str = if result.metadata.is_empty() {
@@ -483,7 +483,7 @@ fn handle_vector_command(
             println!("✅ Imported {} vectors successfully", count);
         }
 
-        VectorCommands::Export { file, format } => {
+        VectorCommands::Export { file, format: _ } => {
             println!("Exporting vectors to {:?}...", file);
 
             // This would need iteration support in Helix
@@ -621,7 +621,7 @@ fn benchmark_mixed(
 
     let inserts = (operations as f64 * insert_ratio) as usize;
     let searches = (operations as f64 * search_ratio) as usize;
-    let deletes = operations - inserts - searches;
+    let deletes = (operations as f64 * delete_ratio) as usize;
 
     println!(
         "Operations: {} inserts, {} searches, {} deletes",

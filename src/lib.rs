@@ -675,8 +675,10 @@ mod tests {
         assert!(file_path.exists());
 
         // Test loading the file directly (rather than using open_default which might create a new one)
-        let db2 = Helix::load(&file_path).unwrap();
-        assert_eq!(db2.len(), 3);
+        {
+            let db2 = Helix::load(&file_path).unwrap();
+            assert_eq!(db2.len(), 3);
+        } // db2 goes out of scope here
 
         // Restore original directory
         env::set_current_dir(&original_dir).unwrap();
