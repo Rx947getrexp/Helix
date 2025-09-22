@@ -9,16 +9,16 @@
 //!
 //! Run with: cargo run --example performance_benchmark --release
 
+use helix::{Helix, IndexType, VecLiteConfig};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::thread;
-use std::time::{Duration, Instant};
-use helix::{Helix, HelixConfig, IndexType};
+use std::time::Instant;
 
 const DIMENSIONS: usize = 128;
 const SMALL_DATASET: usize = 1_000;
 const MEDIUM_DATASET: usize = 10_000;
-const LARGE_DATASET: usize = 100_000;
+const _LARGE_DATASET: usize = 100_000;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("⚡ Helix Performance Benchmark");
@@ -90,7 +90,10 @@ fn benchmark_insertion_performance() -> Result<(), Box<dyn std::error::Error>> {
     let dataset_sizes = vec![SMALL_DATASET, MEDIUM_DATASET];
 
     for &size in &dataset_sizes {
-        println!("📊 Testing insertion of {} vectors ({} dimensions)", size, DIMENSIONS);
+        println!(
+            "📊 Testing insertion of {} vectors ({} dimensions)",
+            size, DIMENSIONS
+        );
 
         // Test individual insertions
         let db = Helix::new()?;
@@ -112,8 +115,14 @@ fn benchmark_insertion_performance() -> Result<(), Box<dyn std::error::Error>> {
 
         let batch_rate = size as f64 / batch_duration.as_secs_f64();
 
-        println!("   Individual: {:>8?} ({:>8.0} vectors/sec)", individual_duration, individual_rate);
-        println!("   Batch:      {:>8?} ({:>8.0} vectors/sec)", batch_duration, batch_rate);
+        println!(
+            "   Individual: {:>8?} ({:>8.0} vectors/sec)",
+            individual_duration, individual_rate
+        );
+        println!(
+            "   Batch:      {:>8?} ({:>8.0} vectors/sec)",
+            batch_duration, batch_rate
+        );
         println!("   Speedup:    {:.2}x\n", batch_rate / individual_rate);
     }
 
@@ -148,7 +157,10 @@ fn benchmark_search_performance() -> Result<(), Box<dyn std::error::Error>> {
             let avg_latency = duration / queries.len() as u32;
             let qps = queries.len() as f64 / duration.as_secs_f64();
 
-            println!("   K={:2} | Avg latency: {:>6?} | QPS: {:>8.0}", k, avg_latency, qps);
+            println!(
+                "   K={:2} | Avg latency: {:>6?} | QPS: {:>8.0}",
+                k, avg_latency, qps
+            );
         }
 
         println!();
@@ -168,7 +180,10 @@ fn benchmark_index_configurations() -> Result<(), Box<dyn std::error::Error>> {
         ("HNSW-Large", create_hnsw_config(32, 400, 200)),
     ];
 
-    println!("⚙️  Comparing index configurations on {} vectors:", MEDIUM_DATASET);
+    println!(
+        "⚙️  Comparing index configurations on {} vectors:",
+        MEDIUM_DATASET
+    );
     println!();
 
     for (name, config) in configurations {
@@ -193,7 +208,10 @@ fn benchmark_index_configurations() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("   🏗️  Build time: {:>8?}", build_duration);
         println!("   🔍 Avg search: {:>8?}", avg_search_time);
-        println!("   💾 Memory:     {:>8} bytes", stats.memory.current_allocated);
+        println!(
+            "   💾 Memory:     {:>8} bytes",
+            stats.memory.current_allocated
+        );
         println!();
     }
 
@@ -216,10 +234,10 @@ fn benchmark_memory_usage() -> Result<(), Box<dyn std::error::Error>> {
         let stats = db.stats();
         let memory_per_vector = stats.memory.current_allocated / size;
 
-        println!("   {:>8} | {:>9} B | {:>8} B",
-                size,
-                stats.memory.current_allocated,
-                memory_per_vector);
+        println!(
+            "   {:>8} | {:>9} B | {:>8} B",
+            size, stats.memory.current_allocated, memory_per_vector
+        );
     }
 
     println!();
@@ -242,11 +260,10 @@ fn benchmark_memory_usage() -> Result<(), Box<dyn std::error::Error>> {
         let memory_per_vector = stats.memory.current_allocated / vector_count;
         let memory_per_dim = memory_per_vector / dim;
 
-        println!("   {:>4} | {:>9} B | {:>8} B | {:>6} B",
-                dim,
-                stats.memory.current_allocated,
-                memory_per_vector,
-                memory_per_dim);
+        println!(
+            "   {:>4} | {:>9} B | {:>8} B | {:>6} B",
+            dim, stats.memory.current_allocated, memory_per_vector, memory_per_dim
+        );
     }
 
     Ok(())
@@ -287,7 +304,10 @@ fn benchmark_concurrent_access() -> Result<(), Box<dyn std::error::Error>> {
         let duration = start_time.elapsed();
         let qps = total_queries as f64 / duration.as_secs_f64();
 
-        println!("   {} threads: {:>6} QPS ({:>6?} total)", thread_count, qps as u64, duration);
+        println!(
+            "   {} threads: {:>6} QPS ({:>6?} total)",
+            thread_count, qps as u64, duration
+        );
     }
 
     println!();
@@ -308,19 +328,18 @@ fn benchmark_batch_operations() -> Result<(), Box<dyn std::error::Error>> {
         let start_time = Instant::now();
 
         for batch_idx in 0..batches {
-            let batch_vectors = generate_test_vectors_with_offset(
-                batch_size,
-                DIMENSIONS,
-                batch_idx * batch_size
-            );
+            let batch_vectors =
+                generate_test_vectors_with_offset(batch_size, DIMENSIONS, batch_idx * batch_size);
             db.insert_batch(batch_vectors)?;
         }
 
         let duration = start_time.elapsed();
         let rate = total_vectors as f64 / duration.as_secs_f64();
 
-        println!("   Batch size {:>4}: {:>8?} ({:>8.0} vectors/sec)",
-                batch_size, duration, rate);
+        println!(
+            "   Batch size {:>4}: {:>8?} ({:>8.0} vectors/sec)",
+            batch_size, duration, rate
+        );
     }
 
     // Batch search performance
@@ -350,8 +369,10 @@ fn benchmark_batch_operations() -> Result<(), Box<dyn std::error::Error>> {
 
         let speedup = individual_duration.as_secs_f64() / batch_duration.as_secs_f64();
 
-        println!("   {} queries: Individual {:>6?} | Batch {:>6?} | Speedup {:.2}x",
-                query_count, individual_duration, batch_duration, speedup);
+        println!(
+            "   {} queries: Individual {:>6?} | Batch {:>6?} | Speedup {:.2}x",
+            query_count, individual_duration, batch_duration, speedup
+        );
     }
 
     Ok(())
@@ -366,14 +387,17 @@ fn benchmark_distance_metrics() -> Result<(), Box<dyn std::error::Error>> {
     let metrics = vec!["euclidean", "cosine", "dot_product", "manhattan"];
     let iterations = 100;
 
-    println!("📐 Distance metric performance ({} searches each):", iterations);
+    println!(
+        "📐 Distance metric performance ({} searches each):",
+        iterations
+    );
 
     for metric in metrics {
         let start_time = Instant::now();
 
         for _ in 0..iterations {
             match db.search_with_metric(&query, 10, metric) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(_) => continue, // Skip unsupported metrics
             }
         }
@@ -381,7 +405,10 @@ fn benchmark_distance_metrics() -> Result<(), Box<dyn std::error::Error>> {
         let duration = start_time.elapsed();
         let avg_time = duration / iterations;
 
-        println!("   {:>12}: {:>6?} avg ({:>6?} total)", metric, avg_time, duration);
+        println!(
+            "   {:>12}: {:>6?} avg ({:>6?} total)",
+            metric, avg_time, duration
+        );
     }
 
     Ok(())
@@ -389,14 +416,17 @@ fn benchmark_distance_metrics() -> Result<(), Box<dyn std::error::Error>> {
 
 // Helper functions
 
-fn generate_test_vectors(count: usize, dimensions: usize) -> Vec<(String, Vec<f32>, HashMap<String, String>)> {
+fn generate_test_vectors(
+    count: usize,
+    dimensions: usize,
+) -> Vec<(String, Vec<f32>, HashMap<String, String>)> {
     generate_test_vectors_with_offset(count, dimensions, 0)
 }
 
 fn generate_test_vectors_with_offset(
     count: usize,
     dimensions: usize,
-    offset: usize
+    offset: usize,
 ) -> Vec<(String, Vec<f32>, HashMap<String, String>)> {
     (0..count)
         .map(|i| {
@@ -430,14 +460,14 @@ fn generate_random_vector(dimensions: usize) -> Vec<f32> {
         .collect()
 }
 
-fn create_brute_force_config() -> HelixConfig {
-    let mut config = HelixConfig::default();
+fn create_brute_force_config() -> VecLiteConfig {
+    let mut config = VecLiteConfig::default();
     config.index.index_type = IndexType::BruteForce;
     config
 }
 
-fn create_hnsw_config(max_m: usize, ef_construction: usize, ef_search: usize) -> HelixConfig {
-    let mut config = HelixConfig::default();
+fn create_hnsw_config(max_m: usize, ef_construction: usize, ef_search: usize) -> VecLiteConfig {
+    let mut config = VecLiteConfig::default();
     config.index.index_type = IndexType::HNSW;
     config.index.hnsw.max_m = max_m;
     config.index.hnsw.ef_construction = ef_construction;

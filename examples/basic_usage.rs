@@ -8,8 +8,8 @@
 //!
 //! Run with: cargo run --example basic_usage
 
+use helix::{Helix, VecLiteConfig};
 use std::collections::HashMap;
-use helix::{Helix, HelixConfig};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 Helix Basic Usage Example");
@@ -27,31 +27,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "doc1",
             vec![1.0, 0.5, 0.8],
             "This is about machine learning and AI",
-            "technology"
+            "technology",
         ),
         (
             "doc2",
             vec![0.2, 1.0, 0.3],
             "Cooking recipes and food preparation",
-            "food"
+            "food",
         ),
         (
             "doc3",
             vec![0.9, 0.4, 1.0],
             "Latest developments in quantum computing",
-            "technology"
+            "technology",
         ),
         (
             "doc4",
             vec![0.1, 0.8, 0.2],
             "Healthy eating and nutrition tips",
-            "food"
+            "food",
         ),
         (
             "doc5",
             vec![0.7, 0.1, 0.9],
             "Artificial intelligence and neural networks",
-            "technology"
+            "technology",
         ),
     ];
 
@@ -74,7 +74,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("📈 Database Statistics:");
     println!("   📊 Total vectors: {}", db.len());
     println!("   📏 Dimensions: {:?}", db.stats().dimensions);
-    println!("   💾 Memory usage: {} bytes", db.stats().memory.current_allocated);
+    println!(
+        "   💾 Memory usage: {} bytes",
+        db.stats().memory.current_allocated
+    );
     println!();
 
     // Step 5: Perform basic search
@@ -86,7 +89,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("   📋 Found {} results:", search_results.len());
     for (i, result) in search_results.iter().enumerate() {
-        println!("   {}. ID: {} (Score: {:.4})", i + 1, result.id, result.score);
+        println!(
+            "   {}. ID: {} (Score: {:.4})",
+            i + 1,
+            result.id,
+            result.score
+        );
         if let Some(description) = result.metadata.get("description") {
             println!("      Description: {}", description);
         }
@@ -117,11 +125,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Step 7: Search with metadata filtering
     println!("🎛️  Searching with metadata filter...");
-    let filtered_results = db.search_with_filter(
-        &query_vector,
-        5,
-        |metadata| metadata.get("category") == Some(&"technology".to_string())
-    )?;
+    let filtered_results = db.search_with_filter(&query_vector, 5, |metadata| {
+        metadata.get("category") == Some(&"technology".to_string())
+    })?;
 
     println!("   🔍 Technology documents only:");
     for result in filtered_results {
@@ -148,12 +154,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (
             "batch1".to_string(),
             vec![0.3, 0.7, 0.5],
-            HashMap::from([("type".to_string(), "batch".to_string())])
+            HashMap::from([("type".to_string(), "batch".to_string())]),
         ),
         (
             "batch2".to_string(),
             vec![0.6, 0.2, 0.8],
-            HashMap::from([("type".to_string(), "batch".to_string())])
+            HashMap::from([("type".to_string(), "batch".to_string())]),
         ),
     ];
 
@@ -177,19 +183,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Verify data integrity
     let verification_results = loaded_db.search(&query_vector, 2)?;
-    println!("   🔍 Verification search returned {} results", verification_results.len());
+    println!(
+        "   🔍 Verification search returned {} results",
+        verification_results.len()
+    );
     println!();
 
     // Step 11: Configuration example
     println!("⚙️  Custom configuration example...");
-    let mut config = HelixConfig::default();
+    let mut config = VecLiteConfig::default();
     config.storage.max_vectors = 10_000;
     config.query.default_k = 5;
     config.index.index_type = helix::IndexType::HNSW;
 
     let custom_db = Helix::with_config(config)?;
     println!("   ✅ Created database with custom configuration");
-    println!("   📋 Max vectors: {}", custom_db.config().storage.max_vectors);
+    println!(
+        "   📋 Max vectors: {}",
+        custom_db.config().storage.max_vectors
+    );
     println!("   🎯 Default K: {}", custom_db.config().query.default_k);
     println!();
 

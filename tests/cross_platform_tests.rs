@@ -1,9 +1,9 @@
 // Cross-platform compatibility tests for VecLite
 // Ensures consistent behavior across different operating systems and architectures
 
+use helix::{Helix, VecLiteConfig};
 use std::collections::HashMap;
 use tempfile::tempdir;
-use veclite::{VecLite, VecLiteConfig};
 
 // Test configuration constants
 const TEST_VECTORS: usize = 1000;
@@ -27,7 +27,7 @@ fn create_test_data() -> Vec<(String, Vec<f32>, HashMap<String, String>)> {
 
 #[test]
 fn test_basic_operations_cross_platform() {
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
     let test_data = create_test_data();
 
     // Test batch insertion
@@ -57,7 +57,7 @@ fn test_file_persistence_cross_platform() {
 
     // Create and populate database
     {
-        let db = VecLite::new().unwrap();
+        let db = Helix::new().unwrap();
         let test_data = create_test_data();
         db.insert_batch(test_data).unwrap();
 
@@ -66,7 +66,7 @@ fn test_file_persistence_cross_platform() {
     }
 
     // Load from file
-    let loaded_db = VecLite::load(&db_path).unwrap();
+    let loaded_db = Helix::load(&db_path).unwrap();
     assert_eq!(loaded_db.len(), TEST_VECTORS);
 
     // Verify data integrity
@@ -100,7 +100,7 @@ fn test_path_handling_cross_platform() {
             std::fs::create_dir_all(parent).unwrap();
         }
 
-        let db = VecLite::new().unwrap();
+        let db = Helix::new().unwrap();
         let test_vector = vec![1.0, 2.0, 3.0];
         let metadata = HashMap::from([("test".to_string(), "path".to_string())]);
 
@@ -113,7 +113,7 @@ fn test_path_handling_cross_platform() {
 
         // Save and load
         db.save(&path).unwrap();
-        let loaded_db = VecLite::load(&path).unwrap();
+        let loaded_db = Helix::load(&path).unwrap();
 
         // Verify
         let retrieved = loaded_db.get(&"test_vector".to_string()).unwrap().unwrap();
@@ -136,7 +136,7 @@ fn test_memory_behavior_cross_platform() {
     config.memory.max_memory_bytes = memory_limit;
     config.memory.enable_monitoring = true;
 
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     // Insert data gradually and monitor memory
     let batch_size = 100;
@@ -162,7 +162,7 @@ fn test_memory_behavior_cross_platform() {
 
 #[test]
 fn test_floating_point_precision_cross_platform() {
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
 
     // Test various floating point edge cases
     let test_cases = vec![
@@ -203,7 +203,7 @@ fn test_floating_point_precision_cross_platform() {
 
 #[test]
 fn test_unicode_support_cross_platform() {
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
 
     // Test various Unicode strings in metadata and IDs
     let unicode_tests = vec![
@@ -253,7 +253,7 @@ fn test_concurrent_access_cross_platform() {
     use std::sync::Arc;
     use std::thread;
 
-    let db = Arc::new(VecLite::new().unwrap());
+    let db = Arc::new(Helix::new().unwrap());
     let thread_count = if cfg!(target_os = "windows") { 4 } else { 8 };
 
     // Pre-populate with some data
@@ -336,7 +336,7 @@ fn test_large_file_handling_cross_platform() {
     let large_test_size = 5000;
     let large_dimensions = 256;
 
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
 
     // Insert data in chunks to avoid memory issues
     let chunk_size = 500;
@@ -369,7 +369,7 @@ fn test_large_file_handling_cross_platform() {
     assert!(file_size >= expected_min_size / 2); // Allow for compression
 
     // Load and verify
-    let loaded_db = VecLite::load(&large_db_path).unwrap();
+    let loaded_db = Helix::load(&large_db_path).unwrap();
     assert_eq!(loaded_db.len(), large_test_size);
 
     // Test search on large database
@@ -397,7 +397,7 @@ fn test_error_handling_cross_platform() {
     };
 
     for invalid_path in invalid_paths {
-        let db = VecLite::new().unwrap();
+        let db = Helix::new().unwrap();
         let result = db.save(invalid_path);
         assert!(
             result.is_err(),
@@ -407,11 +407,11 @@ fn test_error_handling_cross_platform() {
     }
 
     // Test loading non-existent files
-    let result = VecLite::load("non_existent_file.vlt");
+    let result = Helix::load("non_existent_file.vlt");
     assert!(result.is_err());
 
     // Test invalid vector dimensions
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
     db.insert("test1".to_string(), vec![1.0, 2.0], HashMap::new())
         .unwrap();
 
@@ -423,7 +423,7 @@ fn test_error_handling_cross_platform() {
 fn test_performance_consistency_cross_platform() {
     use std::time::Instant;
 
-    let db = VecLite::new().unwrap();
+    let db = Helix::new().unwrap();
     let test_data = create_test_data();
 
     // Measure insertion performance
@@ -500,7 +500,7 @@ fn test_configuration_platform_specific() {
         config.memory.pool_max_pools = 2000;
     }
 
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     // Test that the configuration is properly applied
     let db_config = db.config();

@@ -4,15 +4,15 @@
 //! including vector operations, search, persistence, and performance benchmarking.
 
 use clap::{Parser, Subcommand, ValueEnum};
-use serde_json::{Map, Value};
+use helix::{
+    types::{Metadata, VectorData},
+    Helix, VecLiteConfig,
+};
+use serde_json::Value;
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::time::Instant;
-use helix::{
-    types::{Metadata, VectorData},
-    Helix, HelixConfig,
-};
 
 #[derive(Parser)]
 #[command(name = "helix")]
@@ -217,7 +217,7 @@ fn handle_database_command(
 
             println!("Creating new database at {:?}", db_path);
 
-            let mut config = HelixConfig::default();
+            let mut config = VecLiteConfig::default();
             config.storage.max_vectors = max_vectors;
             config.query.default_k = default_k;
 

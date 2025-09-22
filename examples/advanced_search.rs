@@ -9,9 +9,9 @@
 //!
 //! Run with: cargo run --example advanced_search
 
+use helix::{Helix, IndexType, VecLiteConfig};
 use std::collections::HashMap;
 use std::time::Instant;
-use helix::{Helix, HelixConfig, IndexType};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🔍 Helix Advanced Search Example");
@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Step 1: Create database with optimized configuration
     println!("⚙️  Setting up optimized Helix configuration...");
-    let mut config = HelixConfig::default();
+    let mut config = VecLiteConfig::default();
     config.index.index_type = IndexType::HNSW;
     config.index.hnsw.ef_construction = 200;
     config.index.hnsw.ef_search = 100;
@@ -87,40 +87,234 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn create_document_dataset() -> Vec<(String, Vec<f32>, HashMap<String, String>)> {
     vec![
         // Technology documents
-        ("tech_001".to_string(), vec![0.9, 0.1, 0.8, 0.2, 0.7], create_metadata("Machine Learning Fundamentals", "technology", "ai", 2023, 4.5, "en")),
-        ("tech_002".to_string(), vec![0.8, 0.2, 0.9, 0.1, 0.6], create_metadata("Deep Learning with PyTorch", "technology", "ai", 2023, 4.7, "en")),
-        ("tech_003".to_string(), vec![0.7, 0.3, 0.7, 0.4, 0.8], create_metadata("Computer Vision Applications", "technology", "ai", 2022, 4.3, "en")),
-        ("tech_004".to_string(), vec![0.6, 0.1, 0.5, 0.8, 0.4], create_metadata("Web Development with React", "technology", "web", 2023, 4.2, "en")),
-        ("tech_005".to_string(), vec![0.5, 0.2, 0.6, 0.7, 0.5], create_metadata("Database Design Principles", "technology", "database", 2022, 4.0, "en")),
-
+        (
+            "tech_001".to_string(),
+            vec![0.9, 0.1, 0.8, 0.2, 0.7],
+            create_metadata(
+                "Machine Learning Fundamentals",
+                "technology",
+                "ai",
+                2023,
+                4.5,
+                "en",
+            ),
+        ),
+        (
+            "tech_002".to_string(),
+            vec![0.8, 0.2, 0.9, 0.1, 0.6],
+            create_metadata(
+                "Deep Learning with PyTorch",
+                "technology",
+                "ai",
+                2023,
+                4.7,
+                "en",
+            ),
+        ),
+        (
+            "tech_003".to_string(),
+            vec![0.7, 0.3, 0.7, 0.4, 0.8],
+            create_metadata(
+                "Computer Vision Applications",
+                "technology",
+                "ai",
+                2022,
+                4.3,
+                "en",
+            ),
+        ),
+        (
+            "tech_004".to_string(),
+            vec![0.6, 0.1, 0.5, 0.8, 0.4],
+            create_metadata(
+                "Web Development with React",
+                "technology",
+                "web",
+                2023,
+                4.2,
+                "en",
+            ),
+        ),
+        (
+            "tech_005".to_string(),
+            vec![0.5, 0.2, 0.6, 0.7, 0.5],
+            create_metadata(
+                "Database Design Principles",
+                "technology",
+                "database",
+                2022,
+                4.0,
+                "en",
+            ),
+        ),
         // Science documents
-        ("sci_001".to_string(), vec![0.2, 0.9, 0.3, 0.8, 0.1], create_metadata("Quantum Physics Explained", "science", "physics", 2023, 4.8, "en")),
-        ("sci_002".to_string(), vec![0.3, 0.8, 0.2, 0.9, 0.2], create_metadata("Climate Change Impact", "science", "environment", 2023, 4.6, "en")),
-        ("sci_003".to_string(), vec![0.1, 0.7, 0.4, 0.6, 0.3], create_metadata("Genetic Engineering Advances", "science", "biology", 2022, 4.4, "en")),
-        ("sci_004".to_string(), vec![0.4, 0.6, 0.1, 0.7, 0.4], create_metadata("Space Exploration Timeline", "science", "astronomy", 2023, 4.5, "en")),
-
+        (
+            "sci_001".to_string(),
+            vec![0.2, 0.9, 0.3, 0.8, 0.1],
+            create_metadata(
+                "Quantum Physics Explained",
+                "science",
+                "physics",
+                2023,
+                4.8,
+                "en",
+            ),
+        ),
+        (
+            "sci_002".to_string(),
+            vec![0.3, 0.8, 0.2, 0.9, 0.2],
+            create_metadata(
+                "Climate Change Impact",
+                "science",
+                "environment",
+                2023,
+                4.6,
+                "en",
+            ),
+        ),
+        (
+            "sci_003".to_string(),
+            vec![0.1, 0.7, 0.4, 0.6, 0.3],
+            create_metadata(
+                "Genetic Engineering Advances",
+                "science",
+                "biology",
+                2022,
+                4.4,
+                "en",
+            ),
+        ),
+        (
+            "sci_004".to_string(),
+            vec![0.4, 0.6, 0.1, 0.7, 0.4],
+            create_metadata(
+                "Space Exploration Timeline",
+                "science",
+                "astronomy",
+                2023,
+                4.5,
+                "en",
+            ),
+        ),
         // Health documents
-        ("health_001".to_string(), vec![0.1, 0.3, 0.9, 0.4, 0.8], create_metadata("Nutrition and Wellness Guide", "health", "nutrition", 2023, 4.1, "en")),
-        ("health_002".to_string(), vec![0.2, 0.4, 0.8, 0.5, 0.9], create_metadata("Exercise for Mental Health", "health", "fitness", 2022, 4.3, "en")),
-        ("health_003".to_string(), vec![0.3, 0.2, 0.7, 0.3, 0.6], create_metadata("Sleep and Recovery", "health", "wellness", 2023, 4.0, "en")),
-
+        (
+            "health_001".to_string(),
+            vec![0.1, 0.3, 0.9, 0.4, 0.8],
+            create_metadata(
+                "Nutrition and Wellness Guide",
+                "health",
+                "nutrition",
+                2023,
+                4.1,
+                "en",
+            ),
+        ),
+        (
+            "health_002".to_string(),
+            vec![0.2, 0.4, 0.8, 0.5, 0.9],
+            create_metadata(
+                "Exercise for Mental Health",
+                "health",
+                "fitness",
+                2022,
+                4.3,
+                "en",
+            ),
+        ),
+        (
+            "health_003".to_string(),
+            vec![0.3, 0.2, 0.7, 0.3, 0.6],
+            create_metadata("Sleep and Recovery", "health", "wellness", 2023, 4.0, "en"),
+        ),
         // Arts documents
-        ("art_001".to_string(), vec![0.8, 0.7, 0.2, 0.1, 0.3], create_metadata("Renaissance Art History", "arts", "painting", 2022, 4.7, "en")),
-        ("art_002".to_string(), vec![0.7, 0.6, 0.3, 0.2, 0.4], create_metadata("Modern Photography Techniques", "arts", "photography", 2023, 4.2, "en")),
-        ("art_003".to_string(), vec![0.6, 0.8, 0.1, 0.3, 0.2], create_metadata("Music Theory Basics", "arts", "music", 2022, 4.4, "en")),
-
+        (
+            "art_001".to_string(),
+            vec![0.8, 0.7, 0.2, 0.1, 0.3],
+            create_metadata(
+                "Renaissance Art History",
+                "arts",
+                "painting",
+                2022,
+                4.7,
+                "en",
+            ),
+        ),
+        (
+            "art_002".to_string(),
+            vec![0.7, 0.6, 0.3, 0.2, 0.4],
+            create_metadata(
+                "Modern Photography Techniques",
+                "arts",
+                "photography",
+                2023,
+                4.2,
+                "en",
+            ),
+        ),
+        (
+            "art_003".to_string(),
+            vec![0.6, 0.8, 0.1, 0.3, 0.2],
+            create_metadata("Music Theory Basics", "arts", "music", 2022, 4.4, "en"),
+        ),
         // Business documents
-        ("biz_001".to_string(), vec![0.4, 0.5, 0.6, 0.9, 0.7], create_metadata("Startup Business Strategy", "business", "strategy", 2023, 4.3, "en")),
-        ("biz_002".to_string(), vec![0.5, 0.4, 0.7, 0.8, 0.8], create_metadata("Digital Marketing Trends", "business", "marketing", 2023, 4.1, "en")),
-        ("biz_003".to_string(), vec![0.3, 0.6, 0.5, 0.7, 0.6], create_metadata("Financial Planning Guide", "business", "finance", 2022, 4.5, "en")),
-
+        (
+            "biz_001".to_string(),
+            vec![0.4, 0.5, 0.6, 0.9, 0.7],
+            create_metadata(
+                "Startup Business Strategy",
+                "business",
+                "strategy",
+                2023,
+                4.3,
+                "en",
+            ),
+        ),
+        (
+            "biz_002".to_string(),
+            vec![0.5, 0.4, 0.7, 0.8, 0.8],
+            create_metadata(
+                "Digital Marketing Trends",
+                "business",
+                "marketing",
+                2023,
+                4.1,
+                "en",
+            ),
+        ),
+        (
+            "biz_003".to_string(),
+            vec![0.3, 0.6, 0.5, 0.7, 0.6],
+            create_metadata(
+                "Financial Planning Guide",
+                "business",
+                "finance",
+                2022,
+                4.5,
+                "en",
+            ),
+        ),
         // International content
-        ("intl_001".to_string(), vec![0.9, 0.2, 0.7, 0.3, 0.8], create_metadata("机器学习入门", "technology", "ai", 2023, 4.6, "zh")),
-        ("intl_002".to_string(), vec![0.2, 0.8, 0.3, 0.7, 0.1], create_metadata("Física Cuántica", "science", "physics", 2023, 4.4, "es")),
+        (
+            "intl_001".to_string(),
+            vec![0.9, 0.2, 0.7, 0.3, 0.8],
+            create_metadata("机器学习入门", "technology", "ai", 2023, 4.6, "zh"),
+        ),
+        (
+            "intl_002".to_string(),
+            vec![0.2, 0.8, 0.3, 0.7, 0.1],
+            create_metadata("Física Cuántica", "science", "physics", 2023, 4.4, "es"),
+        ),
     ]
 }
 
-fn create_metadata(title: &str, category: &str, subcategory: &str, year: i32, rating: f32, language: &str) -> HashMap<String, String> {
+fn create_metadata(
+    title: &str,
+    category: &str,
+    subcategory: &str,
+    year: i32,
+    rating: f32,
+    language: &str,
+) -> HashMap<String, String> {
     HashMap::from([
         ("title".to_string(), title.to_string()),
         ("category".to_string(), category.to_string()),
@@ -128,7 +322,10 @@ fn create_metadata(title: &str, category: &str, subcategory: &str, year: i32, ra
         ("year".to_string(), year.to_string()),
         ("rating".to_string(), rating.to_string()),
         ("language".to_string(), language.to_string()),
-        ("indexed_at".to_string(), chrono::Utc::now().timestamp().to_string()),
+        (
+            "indexed_at".to_string(),
+            chrono::Utc::now().timestamp().to_string(),
+        ),
     ])
 }
 
@@ -138,9 +335,13 @@ fn demonstrate_complex_filtering(db: &Helix) -> Result<(), Box<dyn std::error::E
     // Filter 1: High-rated technology documents from 2023
     println!("🔍 Filter 1: High-rated 2023 technology documents (rating >= 4.5)");
     let results = db.search_with_filter(&query, 5, |metadata| {
-        metadata.get("category") == Some(&"technology".to_string()) &&
-        metadata.get("year") == Some(&"2023".to_string()) &&
-        metadata.get("rating").and_then(|r| r.parse::<f32>().ok()).unwrap_or(0.0) >= 4.5
+        metadata.get("category") == Some(&"technology".to_string())
+            && metadata.get("year") == Some(&"2023".to_string())
+            && metadata
+                .get("rating")
+                .and_then(|r| r.parse::<f32>().ok())
+                .unwrap_or(0.0)
+                >= 4.5
     })?;
 
     print_search_results(&results, "High-rated Tech 2023");
@@ -156,10 +357,15 @@ fn demonstrate_complex_filtering(db: &Helix) -> Result<(), Box<dyn std::error::E
     // Filter 3: AI-related content across categories
     println!("\n🔍 Filter 3: AI-related content (any category)");
     let results = db.search_with_filter(&query, 10, |metadata| {
-        metadata.get("subcategory") == Some(&"ai".to_string()) ||
-        metadata.get("title").map(|t| t.to_lowercase().contains("ai") ||
-                                    t.to_lowercase().contains("machine learning") ||
-                                    t.to_lowercase().contains("deep learning")).unwrap_or(false)
+        metadata.get("subcategory") == Some(&"ai".to_string())
+            || metadata
+                .get("title")
+                .map(|t| {
+                    t.to_lowercase().contains("ai")
+                        || t.to_lowercase().contains("machine learning")
+                        || t.to_lowercase().contains("deep learning")
+                })
+                .unwrap_or(false)
     })?;
 
     print_search_results(&results, "AI-Related Content");
@@ -206,10 +412,10 @@ fn demonstrate_batch_search(db: &Helix) -> Result<(), Box<dyn std::error::Error>
 
     // Create multiple query vectors
     let queries = vec![
-        ("Tech Query", vec![0.9, 0.1, 0.7, 0.2, 0.8]),      // Technology-focused
-        ("Science Query", vec![0.2, 0.9, 0.3, 0.8, 0.1]),   // Science-focused
-        ("Health Query", vec![0.1, 0.3, 0.9, 0.4, 0.7]),    // Health-focused
-        ("Arts Query", vec![0.8, 0.7, 0.2, 0.1, 0.3]),      // Arts-focused
+        ("Tech Query", vec![0.9, 0.1, 0.7, 0.2, 0.8]), // Technology-focused
+        ("Science Query", vec![0.2, 0.9, 0.3, 0.8, 0.1]), // Science-focused
+        ("Health Query", vec![0.1, 0.3, 0.9, 0.4, 0.7]), // Health-focused
+        ("Arts Query", vec![0.8, 0.7, 0.2, 0.1, 0.3]), // Arts-focused
     ];
 
     let start_time = Instant::now();
@@ -247,7 +453,10 @@ fn demonstrate_batch_search(db: &Helix) -> Result<(), Box<dyn std::error::Error>
 
     println!("   📦 Batch search: {:?}", batch_duration);
     println!("   🔍 Individual searches: {:?}", individual_duration);
-    println!("   🚀 Speedup: {:.2}x", individual_duration.as_secs_f64() / batch_duration.as_secs_f64());
+    println!(
+        "   🚀 Speedup: {:.2}x",
+        individual_duration.as_secs_f64() / batch_duration.as_secs_f64()
+    );
 
     Ok(())
 }
@@ -284,7 +493,8 @@ fn demonstrate_result_analysis(db: &Helix) -> Result<(), Box<dyn std::error::Err
     }
 
     // Rating analysis
-    let ratings: Vec<f32> = results.iter()
+    let ratings: Vec<f32> = results
+        .iter()
         .filter_map(|r| r.metadata.get("rating"))
         .filter_map(|r| r.parse::<f32>().ok())
         .collect();
@@ -324,15 +534,29 @@ fn demonstrate_performance_tuning(db: &Helix) -> Result<(), Box<dyn std::error::
         let results = db.search(&query, k)?;
         let duration = start_time.elapsed();
 
-        println!("   K={:2} | Time: {:>8?} | Results: {:2}", k, duration, results.len());
+        println!(
+            "   K={:2} | Time: {:>8?} | Results: {:2}",
+            k,
+            duration,
+            results.len()
+        );
     }
 
     // Memory usage analysis
     let stats = db.stats();
     println!("\n💾 Memory Usage:");
-    println!("   📊 Current allocated: {} bytes", stats.memory.current_allocated);
-    println!("   📈 Peak allocated: {} bytes", stats.memory.peak_allocated);
-    println!("   🔄 Total allocations: {}", stats.memory.total_allocations);
+    println!(
+        "   📊 Current allocated: {} bytes",
+        stats.memory.current_allocated
+    );
+    println!(
+        "   📈 Peak allocated: {} bytes",
+        stats.memory.peak_allocated
+    );
+    println!(
+        "   🔄 Total allocations: {}",
+        stats.memory.total_allocations
+    );
 
     Ok(())
 }
@@ -350,11 +574,16 @@ fn demonstrate_threshold_filtering(db: &Helix) -> Result<(), Box<dyn std::error:
 
     for threshold in thresholds {
         // Filter results based on threshold (assuming lower scores are better for distance metrics)
-        let filtered_results: Vec<_> = all_results.iter()
+        let filtered_results: Vec<_> = all_results
+            .iter()
             .filter(|r| r.score <= threshold)
             .collect();
 
-        println!("\n📏 Threshold <= {:.1}: {} results", threshold, filtered_results.len());
+        println!(
+            "\n📏 Threshold <= {:.1}: {} results",
+            threshold,
+            filtered_results.len()
+        );
 
         if !filtered_results.is_empty() {
             for (i, result) in filtered_results.iter().take(3).enumerate() {

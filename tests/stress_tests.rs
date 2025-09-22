@@ -1,11 +1,11 @@
 // Stress tests for VecLite performance validation
 // Tests memory monitoring, batch operations, and production readiness
 
+use helix::{Helix, VecLiteConfig};
 use std::collections::HashMap;
 use std::sync::{Arc, Barrier};
 use std::thread;
 use std::time::{Duration, Instant};
-use veclite::{VecLite, VecLiteConfig};
 
 // Test configuration constants
 const STRESS_TEST_VECTORS: usize = 50_000;
@@ -20,7 +20,7 @@ fn test_high_volume_insertions() {
     config.memory.enable_monitoring = true;
     config.memory.warning_threshold_percent = 80;
 
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     println!(
         "Starting high-volume insertion test with {} vectors",
@@ -102,7 +102,7 @@ fn test_high_volume_insertions() {
 #[test]
 fn test_concurrent_operations() {
     let config = VecLiteConfig::default();
-    let db = Arc::new(VecLite::with_config(config).unwrap());
+    let db = Arc::new(Helix::with_config(config).unwrap());
 
     println!(
         "Starting concurrent operations test with {} threads",
@@ -232,7 +232,7 @@ fn test_memory_pressure_and_cleanup() {
     config.memory.cleanup_interval_seconds = 1;
 
     let max_memory_limit = config.memory.max_memory_bytes;
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     println!("Starting memory pressure test with 64MB limit");
 
@@ -326,7 +326,7 @@ fn test_memory_pressure_and_cleanup() {
 #[test]
 fn test_large_batch_operations() {
     let config = VecLiteConfig::default();
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     println!("Starting large batch operations test");
 
@@ -404,7 +404,7 @@ fn test_memory_configuration_updates() {
     config.memory.max_memory_bytes = 128 * 1024 * 1024; // 128MB
     config.memory.warning_threshold_percent = 75;
 
-    let db = VecLite::with_config(config.clone()).unwrap();
+    let db = Helix::with_config(config.clone()).unwrap();
 
     // Verify initial configuration
     let initial_config = db.memory_monitor().get_config();
@@ -446,7 +446,7 @@ fn test_memory_configuration_updates() {
 #[test]
 fn test_performance_regression() {
     let config = VecLiteConfig::default();
-    let db = VecLite::with_config(config).unwrap();
+    let db = Helix::with_config(config).unwrap();
 
     // Baseline performance test
     let test_vectors = 5_000;

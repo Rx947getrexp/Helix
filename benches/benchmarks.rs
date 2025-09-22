@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use helix::{HNSWConfig, Helix, IndexType, Metadata, VecLiteConfig, VectorData};
 use std::collections::HashMap;
-use veclite::{HNSWConfig, IndexType, Metadata, VecLite, VecLiteConfig, VectorData};
 
 fn create_test_vectors(count: usize, dimensions: usize) -> Vec<(String, VectorData, Metadata)> {
     (0..count)
@@ -36,7 +36,7 @@ fn bench_vector_insertion(c: &mut Criterion) {
                 &vectors,
                 |b, vectors| {
                     b.iter_with_setup(
-                        || VecLite::new().unwrap(),
+                        || Helix::new().unwrap(),
                         |db| {
                             for (id, vector, metadata) in vectors.iter() {
                                 black_box(
@@ -54,7 +54,7 @@ fn bench_vector_insertion(c: &mut Criterion) {
                 &vectors,
                 |b, vectors| {
                     b.iter_with_setup(
-                        || VecLite::new().unwrap(),
+                        || Helix::new().unwrap(),
                         |db| {
                             black_box(db.insert_batch(vectors.clone()).unwrap());
                         },
@@ -73,7 +73,7 @@ fn bench_vector_search(c: &mut Criterion) {
     for vector_count in [1000, 10000].iter() {
         for dimensions in [64, 256, 768].iter() {
             let vectors = create_test_vectors(*vector_count, *dimensions);
-            let db = VecLite::new().unwrap();
+            let db = Helix::new().unwrap();
             db.insert_batch(vectors).unwrap();
 
             let query: VectorData = (0..*dimensions).map(|i| (i as f32) / 100.0).collect();
@@ -107,7 +107,7 @@ fn bench_vector_search(c: &mut Criterion) {
 }
 
 fn bench_distance_metrics(c: &mut Criterion) {
-    use veclite::distance::{
+    use helix::distance::{
         CosineDistance, DistanceMetric, DotProductSimilarity, EuclideanDistance,
     };
 
@@ -157,7 +157,7 @@ fn bench_batch_operations(c: &mut Criterion) {
         .collect();
     let vector_refs: Vec<&VectorData> = vectors.iter().collect();
 
-    use veclite::distance::{DistanceMetric, EuclideanDistance};
+    use helix::distance::{DistanceMetric, EuclideanDistance};
     let metric = EuclideanDistance;
 
     group.bench_function("batch_distance_1000x768", |b| {
@@ -206,7 +206,7 @@ fn bench_hnsw_vs_brute_force(c: &mut Criterion) {
             |b, vectors| {
                 b.iter_with_setup(
                     || {
-                        let db = VecLite::with_config(brute_force_config.clone()).unwrap();
+                        let db = Helix::with_config(brute_force_config.clone()).unwrap();
                         for (id, vector, metadata) in vectors.iter() {
                             db.insert(id.clone(), vector.clone(), metadata.clone())
                                 .unwrap();
@@ -225,7 +225,7 @@ fn bench_hnsw_vs_brute_force(c: &mut Criterion) {
             |b, vectors| {
                 b.iter_with_setup(
                     || {
-                        let db = VecLite::with_config(hnsw_config.clone()).unwrap();
+                        let db = Helix::with_config(hnsw_config.clone()).unwrap();
                         for (id, vector, metadata) in vectors.iter() {
                             db.insert(id.clone(), vector.clone(), metadata.clone())
                                 .unwrap();
@@ -285,7 +285,7 @@ fn bench_hnsw_construction(c: &mut Criterion) {
                         config.index.index_type = IndexType::HNSW;
                         config.index.hnsw = hnsw_config.clone();
 
-                        let db = VecLite::with_config(config).unwrap();
+                        let db = Helix::with_config(config).unwrap();
                         for (id, vector, metadata) in vectors.iter() {
                             black_box(
                                 db.insert(id.clone(), vector.clone(), metadata.clone())
