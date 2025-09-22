@@ -2,7 +2,7 @@
 # Security-hardened container with non-root user
 
 # Build stage
-FROM rust:1.75-slim-bookworm as builder
+FROM rust:1.75-slim-bookworm AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy dependency files
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.* ./
 
 # Copy source code
 COPY src ./src

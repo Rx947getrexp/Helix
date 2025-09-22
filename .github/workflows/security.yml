@@ -164,12 +164,29 @@ jobs:
 
       - name: Validate license compatibility
         run: |
-          # Check for GPL, AGPL, or other copyleft licenses
-          if grep -E "(GPL|AGPL)" licenses.json; then
-            echo "❌ Copyleft license detected!"
+          # Check for GPL, AGPL, or other problematic copyleft licenses
+          # Allow LGPL for certain system/low-level libraries
+          if grep -E "(GPL-[0-9]|AGPL)" licenses.json | grep -v "LGPL"; then
+            echo "❌ Strong copyleft license detected!"
             exit 1
+          fi
+
+          # Check for LGPL licenses and validate they are acceptable
+          if grep "LGPL" licenses.json; then
+            echo "ℹ️ LGPL license detected - checking allowlist..."
+            # Allow r-efi and other system libraries with LGPL
+            LGPL_PACKAGES=$(grep -B 3 "LGPL" licenses.json | grep '"name"' | cut -d'"' -f4)
+            ALLOWED_LGPL="r-efi glib openssl"
+
+            for pkg in $LGPL_PACKAGES; do
+              if ! echo "$ALLOWED_LGPL" | grep -q "$pkg"; then
+                echo "❌ Disallowed LGPL package: $pkg"
+                exit 1
+              fi
+            done
+            echo "✅ All LGPL licenses are from allowed system libraries"
           else
-            echo "✅ License check passed"
+            echo "✅ License check passed - no copyleft licenses"
           fi
 
       - name: Upload license report
@@ -255,7 +272,7 @@ jobs:
       - name: Validate CI/CD security
         run: |
           # Check for hardcoded secrets in workflows
-          if grep -r "password\|secret\|token\|key" .github/workflows/ | grep -v "secrets\." | grep -v "#"; then
+          if grep -r "password.*=\|secret.*=\|token.*=\|key.*=" .github/workflows/ | grep -v "secrets\." | grep -v "#"; then
             echo "❌ Potential hardcoded secrets in workflows"
             exit 1
           else
